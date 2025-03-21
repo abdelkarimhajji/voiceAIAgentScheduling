@@ -43,7 +43,7 @@ app.post('/process-speech', async (req: Request, res: Response) => {
   const response = new twiml.VoiceResponse();
 
   if (!userSpeech) {
-    response.say("sorry, i didnt hear anything.");
+    response.say("sorry, i didnt hear anything ");
     res.type('text/xml').send(response.toString());
     return;
   }
@@ -52,7 +52,7 @@ app.post('/process-speech', async (req: Request, res: Response) => {
     const aiReply = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a helpful AI assistant.' },
+        { role: 'system', content: 'you are a helpful AI assistant ' },
         { role: 'user', content: userSpeech },
       ],
     });
@@ -70,7 +70,7 @@ app.post('/process-speech', async (req: Request, res: Response) => {
       speechTimeout: 'auto',
       action: '/process-speech',
     });
-    gather.say("Do you have another question?");
+    gather.say("do you have another question? ");
 
     res.type('text/xml').send(response.toString());
 
@@ -84,5 +84,5 @@ app.post('/process-speech', async (req: Request, res: Response) => {
 
 const port = 8080;
 app.listen(port, () => {
-  console.log(`✅ Server running at http://localhost:${port}`);
+  console.log(`server running at http://localhost:${port}`);
 });
