@@ -13,7 +13,7 @@ client.calls
   .create({
     to: '+16136972195',  
     from: twilioPhoneNumber, 
-    url: 'http://localhost:3000/voice',
+    url: 'https://589c-41-248-48-146.ngrok-free.app/voice',
   })
   .then((call: { sid: string }) => console.log('Call SID:', call.sid))
   .catch((err: Error) => console.log('Error:', err));
