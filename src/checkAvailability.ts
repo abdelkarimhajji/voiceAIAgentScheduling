@@ -15,10 +15,10 @@ export async function checkAvailability(auth: any, startTime: string, endTime: s
   const busySlots = res.data.calendars?.primary?.busy || [];
 
   if (busySlots.length === 0) {
-    console.log('Time slot is available!');
+    console.log('time slot is available');
     return true;
   } else {
-    console.log('Time slot is busy:', busySlots);
+    console.log('time slot is busy: ', busySlots);
     return false;
   }
 }
