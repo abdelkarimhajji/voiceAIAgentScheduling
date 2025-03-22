@@ -18,6 +18,9 @@
     "@types/express": "^5.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "googleapis": "^105.0.0",
+    "open": "^10.1.0",
     "openai": "^4.89.0",
     "twilio": "^5.5.1"
   }
