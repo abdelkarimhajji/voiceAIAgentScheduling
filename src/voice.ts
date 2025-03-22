@@ -23,7 +23,7 @@ app.post('/voice', (req: Request, res: Response) => {
   // here waiting for the client to start talking
   const gather = response.gather({
     input: ['speech'],
-    timeout: 5,
+    timeout: 15,
     speechTimeout: 'auto',
     action: '/process-speech',
   });
