@@ -34,7 +34,7 @@ app.post('/voice', (req: Request, res: Response) => {
   res.send(response.toString());
 });
 
-// 🧠 Handle user's speech input
+// handle user's speech input
 app.post('/process-speech', async (req: Request, res: Response) => {
   const userSpeech = req.body.SpeechResult;
   const response = new Twiml.VoiceResponse();
