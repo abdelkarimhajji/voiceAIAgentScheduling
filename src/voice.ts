@@ -34,7 +34,7 @@ app.post('/voice', (req: Request, res: Response) => {
   res.send(response.toString());
 });
 
-// handle user's speech input
+// handle users speech input
 app.post('/process-speech', async (req: Request, res: Response) => {
   const userSpeech = req.body.SpeechResult;
   const response = new Twiml.VoiceResponse();
@@ -102,7 +102,7 @@ app.post('/process-speech', async (req: Request, res: Response) => {
         const start = `${date}T${time}:00+00:00`;
         const end = `${date}T${nextHour}:${minute}:00+00:00`;
 
-        console.log(`checking availability for: ${start} → ${end}`);
+        console.log(`checking availability for: ${start} -> ${end}`);
 
         const auth = await authorize();
         const isAvailable = await checkAvailability(auth, start, end);
@@ -137,6 +137,9 @@ app.post('/process-speech', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/test', (req: Request, res: Response) => {
+  res.send(' server is working!');
+});
 
 const port = process.env.PORT;
 app.listen(port, () => {
