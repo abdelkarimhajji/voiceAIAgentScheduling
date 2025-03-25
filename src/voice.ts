@@ -56,22 +56,23 @@ app.post('/process-speech', async (req: Request, res: Response) => {
         {
           role: 'system',
           content: `
-            you are a helpful assistant working at a hospital.
+              you are a helpful assistant working at a hospital.
 
-            - if the user asks about hospital-related topics (like scheduling, appointments, doctors, availability, or booking), respond normally.
-            - if the user says anything that indicates they want to end the call (like "thank you", "that's all", or "we're done"), reply with "end_call".
-            - do not reply with anything else when the user wants to end the call.
-            - otherwise, answer the user's question normally.
+              - your job is to assist users with hospital-related and anotherthings, such as scheduling, appointments, doctor availability, visiting hours, or booking.
+              - always keep the conversation going — never end the call.
+              - after every answer, ask: "do you need anything else?"
+              - if the user asks to check appointment availability, respond using this format: "calendar|YYYY-MM-DD|HH:mm"
+              - if the user does not mention a year, always assume the current year is 2025.
+              - if the user says "next year" or mentions a specific year (like 2026), use that instead.
 
-            examples:
-            user: "can i book an appointment tomorrow at 3 pm?"
-            ai: "calendar|2025-03-22|15:00"
+              examples:
 
-            user: "thank you, that’s all for now"
-            ai: "end_call"
+              user: "can i book an appointment on march 22 at 3 pm?"
+              ai: "calendar|2025-03-22|15:00"
 
-            user: "what is openai?"
-            ai: "i'm sorry, i can only help with hospital-related questions."
+              user: "can i book on march 22 next year at 3 pm?"
+              ai: "calendar|2026-03-22|15:00"
+
             `
 
         },
@@ -82,51 +83,59 @@ app.post('/process-speech', async (req: Request, res: Response) => {
     const aiResponse = aiReply.choices[0].message?.content?.toLowerCase() || "";
     console.log("ai response:", aiResponse);
 
-    if (aiResponse.trim() === "end_call") {
-      response.say("okay, thank you. have a nice day!");
-      response.hangup(); // 📞 End the call
-      res.type('text/xml').send(response.toString());
-      return;
-    }
+    // if (aiResponse.trim() === "end_call") {
+    //   response.say("okay, thank you. have a nice day!");
+    //   response.hangup(); 
+    //   res.type('text/xml').send(response.toString());
+    //   return;
+    // }
 
     if (aiResponse.startsWith("calendar|")) {
-      const parts = aiResponse.split("|");
-
+      const cleanLine = aiResponse.split("\n")[0]; // ✅ get only the first line
+      const parts = cleanLine.split("|");
+    
       if (parts.length === 3) {
-        const date = parts[1];        
-        const time = parts[2];        
+        const date = parts[1];
+        let time = parts[2];
+    
+        // ✅ If time has a range (like "15:00-16:00"), pick the start time
+        if (time.includes("-")) {
+          time = time.split("-")[0];
+        }
+    
         const hour = parseInt(time.split(":")[0]);
         const minute = time.split(":")[1];
         const nextHour = (hour + 1).toString().padStart(2, '0');
-
+    
         const start = `${date}T${time}:00+00:00`;
         const end = `${date}T${nextHour}:${minute}:00+00:00`;
-
+    
         console.log(`checking availability for: ${start} -> ${end}`);
-
+    
         const auth = await authorize();
         const isAvailable = await checkAvailability(auth, start, end);
-
+    
         answer = isAvailable
-          ? "yes that time is available."
-          : "no that time is already booked.";
+          ? "yes, that time is available."
+          : "no, that time is already booked.";
       }
-    } else {
+    }
+     else {
       // if the question dosnt have relation with the calander
       answer = aiResponse;
     }
 
     // here answer and ask if still more questions
-    response.say(answer);
- 
     const gather = response.gather({
       input: ['speech'],
-      timeout: 5,
+      timeout: 10,
       speechTimeout: 'auto',
       action: '/process-speech',
     });
-
+    
+    gather.say(answer);
     gather.say("do you have another question ");
+    
 
     res.type('text/xml').send(response.toString());
 
@@ -145,3 +154,4 @@ const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`server running in http://localhost:${port}`);
 });
+
